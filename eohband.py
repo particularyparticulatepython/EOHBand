@@ -1,4 +1,4 @@
-#! /usr/bin/env python3
+#! /usr/bin/env python
 ######################
 # Author: Anil Radhakrishnan
 # Last Updated: 2017/12/19
@@ -9,9 +9,6 @@
 
 import numpy as np
 import pyaudio
-# import matplotlib.pyplot as plt
-# import struct
-# import time
 
 ####
 # resource for notes to frequency conversion
@@ -20,7 +17,7 @@ import pyaudio
 # Sampling Parameters           ##can be optimized
 
 MIDIMin = 60  # C4
-MIDIMax = 69  # A4            ##chosen because they were prominent in resource
+MIDIMax = 69  # A4      #chosen simply because they were prominent in resource
 FSamp = int(1e5)  # Hz  #Sampling rate for the FFT
 FSize = 2**10  # Frames per buffer
 FFTSize = 2**4  # Frames for FFT averaging
@@ -31,7 +28,7 @@ dFreq = float(FSamp) / FFTSamp  # Sampling resolution
 ######################
 # Music to math translation
 
-# names for all the notes
+# names for all the notes ## are there more?
 noteNames = 'C C# D D# E F F# G G# A A# B'.split()
 
 
@@ -57,14 +54,12 @@ def MIDI_to_bin(n):
 #######################
 
 
-#######################
-
 # Allocate space to run an FFT.
 buf = np.zeros(FFTSamp, dtype=np.float32)  # sample buffer allocation
 frames = 0
 
 # Initialize audio
-stream = pyaudio.PyAudio().open(format=pyaudio.paInt16,     # 16 bit integer
+stream = pyaudio.PyAudio().open(format=pyaudio.paInt16,    # 16 bit integer
                                 channels=1,
                                 rate=FSamp,
                                 input=True,
@@ -80,8 +75,6 @@ Hann = 0.5 * (1 - np.cos(np.linspace(0, 2 * np.pi, FFTSamp, False)))
 imin = max(0, int(np.floor(MIDI_to_bin(MIDIMin - 1))))
 imax = min(FFTSamp, int(np.ceil(MIDI_to_bin(MIDIMax + 1))))
 
-
-##################
 # Print initial text
 print('sampling at', FSamp, 'Hz with max resolution of', dFreq, 'Hz')
 print()
@@ -94,7 +87,7 @@ while stream.is_active():
     buf[-FSize:] = np.fromstring(stream.read(FSize), np.int16)
 
     # Run the FFT on the windowed buffer
-    fft = np.abs(np.fft.rfft(buf * Hann))
+    fft = np.fft.rfft(buf * Hann)
 
     # Get frequency of maximum response in range
     freq = (np.abs(fft[imin:imax]).argmax() + imin) * dFreq
